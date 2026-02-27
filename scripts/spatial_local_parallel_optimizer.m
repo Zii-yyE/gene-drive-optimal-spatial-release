@@ -3,12 +3,9 @@ clear; close all;
 % This script runs MULTIPLE LOCAL optimizations in PARALLEL.
 % It reads starting points for different time values from a CSV file.
 % --- Define the specific run you want to analyze ---
-drive_type = 'Wolbachia';
+drive_type = '2-locus_TARE';
 % --- Define the TIME points you want to run in parallel ---
-T_range = [100];
-% --- KEY SETTING: Specify the CSV file with the starting vectors ---
-% This file MUST have a 'time' column and 'f1' through 'f200' columns.
-start_points_csv = './start_points/CifAB_start_points.csv';
+T_range = [300 400 500 1000];
 % --- Simulation Parameters ---
 R = 400; % Total simulation domain radius
 r = 200; % Optimization vector dimension (release radius)
@@ -17,6 +14,9 @@ fprintf('Configuring parallel optimizer for drive type: %s\n', drive_type);
 switch drive_type
     case 'Wolbachia'
         simulation_func = @Wolbachia_spatial;
+        % --- KEY SETTING: Specify the CSV file with the starting vectors ---
+        % This file MUST have a 'time' column and 'f1' through 'f200' columns.
+        start_points_csv = './start_points/CifAB_start_points.csv';
     case 'TARE'
         simulation_func = @TARE_spatial; 
     case '2-locus_TARE'
@@ -46,7 +46,7 @@ parfor i = 1:length(T_range)
     T = T_range(i);
     
     % --- Find and extract the starting vector for the current T ---
-    row_idx = find(start_points_table.time == T, 1);
+    row_idx = find(start_points_table.time == 100, 1);
     if isempty(row_idx)
         fprintf('Warning: No starting point found for T=%d in CSV. Skipping this iteration.\n', T);
         continue; % Skip to the next iteration in the parfor loop
@@ -80,7 +80,7 @@ parfor i = 1:length(T_range)
 end
 fprintf('\n--- All parallel optimizations completed ---\n');
 %% ================== 5. Save and Sort All Results ==================
-output_filename = sprintf('./spatial_release/%s_optimal_variable_release.csv', drive_type);
+output_filename = sprintf('./results/variable_release/%s_optimal_variable_release.csv', drive_type);
 fprintf('\nSaving all results to %s...\n', output_filename);
 
 % --- Ensure the output directory exists ---

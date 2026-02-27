@@ -1,4 +1,4 @@
-function [res, initial, final] = TADE_suppression_spatial(intro, Nr, T)
+function [res, initial, final, rsize] = TADE_suppression_spatial(intro, Nr, T)
 %% mesh generation
 % Spatial grid
 dr = 0.5;           
@@ -25,6 +25,7 @@ pop_start = sum(A, 1)*ring_area;
 rr = length(intro);
 A(3, 1:rr) = intro./(1-intro)*K; % wdwr introduction
 initial = A(3, :)*ring_area;
+rsize = A(3, :)*ring_area;
 
 %% reaction-diffusion
 for t = 1:Nt

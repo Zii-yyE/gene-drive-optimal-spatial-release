@@ -1,4 +1,4 @@
-function [res, initial, final] = TARE_spatial(intro, Nr, T)
+function [res, initial, final, rsize] = TARE_spatial(intro, Nr, T)
 %% mesh generation
 % Spatial grid
 dr = 0.5;         
@@ -22,6 +22,7 @@ A(1, :) = K;        % ww population
 rr = length(intro);
 A(4, 1:rr) = intro./(1-intro)*K; % dd introduction
 initial = 2*A(4, :)*ring_area;
+rsize = A(4, :)*ring_area;
 
 %% reaction-diffusion
 for t = 1:Nt

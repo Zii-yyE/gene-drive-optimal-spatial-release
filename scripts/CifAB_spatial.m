@@ -1,4 +1,4 @@
-function [res, initial, final] = CifAB_spatial(intro, Nr, T)
+function [res, initial, final, rsize] = CifAB_spatial(intro, Nr, T)
 %% mesh generation
 % Spatial grid
 dr = 0.5;            % Spatial step size
@@ -23,6 +23,7 @@ A(1, :) = K;        % ww population
 rr = length(intro);
 A(3, 1:rr) = intro./(1-intro)*K;
 initial = 2*A(3, :)*ring_area;
+rsize = A(3, :)*ring_area;
 
 %% reaction-diffusion
 for t = 1:Nt

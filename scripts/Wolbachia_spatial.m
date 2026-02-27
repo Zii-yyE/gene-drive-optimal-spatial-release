@@ -1,4 +1,4 @@
-function [res, initial, final] = Wolbachia_spatial(intro, Nr, T)
+function [res, initial, final, rsize] = Wolbachia_spatial(intro, Nr, T)
 %% mesh generation
 % Spatial grid
 dr = 0.5;            % Spatial step size
@@ -23,6 +23,7 @@ A(1, :) = K;        % w population
 rr = length(intro);
 A(2, 1:rr) = intro./(1-intro)*K;
 initial = A(2, :)*ring_area;
+rsize = A(2, :)*ring_area;
 
 %% reaction-diffusion
 for t = 1:Nt
@@ -35,7 +36,7 @@ for t = 1:Nt
     %% reaction
     P = zeros(m, Nr);
     P(1, :) = fw.^2;
-    P(2, :) = fd.^2+fd.*fw;
+    P(2, :) = fd .* 0.75 .* (fw + fd .* 0.75);
     rxn = lambda./((lambda-1)*N+1);
     reaction = rxn.*N.*P-A;
     

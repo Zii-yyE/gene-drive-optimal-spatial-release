@@ -19,19 +19,19 @@ fprintf('--- Starting Panmictic Optimization for: %s ---\n', DRIVE_TYPE);
 switch DRIVE_TYPE
     case 'TARE'
         drive_function = @TARE_spatial;
-        T_range = 1000:1000:10000;
+        T_range = 10:10:100;
     case '2-locus_TARE'
         drive_function = @Two_locus_TARE_spatial;
-        T_range = 100:100:1000;
+        T_range = 10:10:100;
     case 'TADE_suppression'
         drive_function = @TADE_suppression_spatial;
         T_range = [10 50 75 100 125 150 175 200];
     case 'CifAB'
         drive_function = @CifAB_spatial;
-        T_range = [10, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+        T_range = [1000];
     case 'Wolbachia'
         drive_function = @Wolbachia_spatial;
-        T_range = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
+        T_range = 10:10:100;
     otherwise
         error("Unknown drive type specified: '%s'", DRIVE_TYPE);
 end
@@ -56,6 +56,34 @@ parfor t_idx = 1:length(T_range)
     fprintf('Finished optimization for T = %d: Freq = %.6f\n', T, optimal_frequency);
 end
 
+% Pre-allocate a cell array to store results from workers
+results = cell(length(T_range), 1);
+tic; % Start a timer for the entire parallel operation
+
+parfor t_idx = 1:length(T_range)
+    T = T_range(t_idx);
+    
+    % Define the 1D grid for this specific worker
+    frequency_grid = linspace(0, 0.99, num_frequency_steps);
+    frequency_grid = linspace(0, 0.2, 1000);
+    % Pre-allocate an efficiency vector for this worker
+    efficiency_results = zeros(1, num_frequency_steps);
+    
+    % This inner loop runs on the parallel worker
+    for j = 1:num_frequency_steps
+        frequency = frequency_grid(j);
+        % MODIFICATION: Removed r_max from the function call.
+        efficiency_results(j) = drive_efficiency_panmictic(frequency, R, T, drive_function);
+    end
+    
+    % --- Find the best result for this T ---
+    [max_efficiency, j_max] = max(efficiency_results);
+    optimal_frequency = frequency_grid(j_max);
+    
+    % --- Store results in a struct ---
+    results{t_idx} = struct('time', T, 'frequency', optimal_frequency, 'efficiency', max_efficiency);
+    fprintf('Finished panmictic search for T = %d on worker.\n', T);
+end
 total_elapsed_time = toc;
 fprintf('\n--- All parallel searches completed in %.2f seconds ---\n', total_elapsed_time);
 

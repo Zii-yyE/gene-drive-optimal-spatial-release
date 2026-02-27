@@ -1,7 +1,7 @@
 clear; close all;
 %% ================== 1. Configuration ==================
-drive_type = 'CifAB';
-T_range = [100];
+drive_type = 'Wolbachia';
+T_range = [10 20 30 40 50 60 70 80 90 100];
 R = 400; % Total simulation domain radius
 r = 200; % Optimization vector dimension (release radius)
 
@@ -15,8 +15,8 @@ switch drive_type
         simulation_func = @Wolbachia_spatial;
         optimal_circle_csv = '../results/circle_release/Wolbachia_optimal_circle_release.csv';
 
-        custom_start_point = zeros(1, r);
-        custom_start_point(1:11) = [0.27712081503271 , 0.274911463699575, 0.270707808309674, 0.263779919826942, 0.25370402694546 , 0.240128345518471, 0.222571399186681, 0.200581917034892 , 0.173554624818741  , 0.130004879723616   , 0.0266426595140543];
+        % custom_start_point = zeros(1, r);
+        % custom_start_point(1:11) = [0.27712081503271 , 0.274911463699575, 0.270707808309674, 0.263779919826942, 0.25370402694546 , 0.240128345518471, 0.222571399186681, 0.200581917034892 , 0.173554624818741  , 0.130004879723616   , 0.0266426595140543];
 
     case 'TARE'
         simulation_func = @TARE_spatial; 
@@ -41,7 +41,7 @@ for i = 1:length(T_range)
     fprintf('\n--- Starting optimization for T = %d ---\n', T);
     %% ================== 4. Start Point Generation ==================
     % --- 4.1. Generate random starting points ---
-    n_random_pts = 1;
+    n_random_pts = 5;
     random_pts_matrix = zeros(n_random_pts, r);
     for j = 1:n_random_pts
         random_values = rand(1, 10);

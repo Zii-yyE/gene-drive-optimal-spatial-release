@@ -4,12 +4,12 @@ close all
 fprintf('--- Starting Test ---\n');
 
 % Input gene drive
-drive_type = 'TARE';
+drive_type = '2-locus_TARE';
 
 % Test Parameters
-Nr = 400;
-Nx = 400;
-T = 10;
+Nr = 4000;
+Nx = 200;
+T = 10000;
 fprintf('Parameters:\n');
 fprintf('  Domain Radius: %g\n', Nr);
 fprintf('  Introduction Radius: %d\n', Nx);
@@ -17,9 +17,11 @@ fprintf('  Simulation Time : %d\n', T);
 
 % Input introduction frequency
 intro = zeros(1, Nx);
-intro(1,1:Nx) = 0.99;
+all_intro = readmatrix("../results/variable_release/2-locus_TARE_optimal_variable_release.csv");
+intro(1,1:Nx) = all_intro(21, 2:201);
+% intro(1,1:Nx) = 0.307692578301615;
 % Plot Parameters
-plot_update_freq_dt_steps = 0;
+plot_update_freq_dt_steps = 1000;
 fprintf('Plotting will update every %d dt steps (i.e., every %g time units).\n', plot_update_freq_dt_steps, plot_update_freq_dt_steps*0.05);
 
 fprintf('\nCalling %s_spatial_plotting with visualization...\n', drive_type);
@@ -30,7 +32,7 @@ tic;
 switch drive_type
     case 'TARE'
         drive_efficiency = TARE_spatial_plotting(intro, Nr, T, plot_update_freq_dt_steps);
-    case 'Two_locus_TARE'
+    case '2-locus_TARE'
         drive_efficiency = Two_locus_TARE_spatial_plotting(intro, Nr, T, plot_update_freq_dt_steps);
     case 'TADE_suppression'
         drive_efficiency = TADE_suppression_spatial_plotting(intro, Nr, T, plot_update_freq_dt_steps);

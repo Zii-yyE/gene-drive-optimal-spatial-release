@@ -106,7 +106,7 @@ for t = 1:Nt
     %% reaction
     P = zeros(m, Nr);
     P(1, :) = fw.^2;
-    P(2, :) = fd.^2+fd.*fw;
+    P(2, :) = fd .* 0.75 .* (fw + fd .* 0.75);
     rxn = lambda./((lambda-1)*N+1);
     reaction = rxn.*N.*P-A;
 

@@ -1,0 +1,52 @@
+clear
+close all
+
+fprintf('--- Starting Test ---\n');
+
+% Input gene drive
+drive_type = 'Wolbachia';
+
+% Test Parameters
+Nr = 400;
+Nx = 200;
+T = 100;
+fprintf('Parameters:\n');
+fprintf('  Domain Radius: %g\n', Nr);
+fprintf('  Introduction Radius: %d\n', Nx);
+fprintf('  Simulation Time : %d\n', T);
+
+% Input introduction frequency
+intro = zeros(1, Nx);
+all_intro = readmatrix("../results/variable_release/Wolbachia_optimal_variable_release.csv");
+intro(1,1:Nx) = all_intro(33, 2:201);
+intro(1.)
+% Plot Parameters
+plot_update_freq_dt_steps = 0;
+fprintf('Plotting will update every %d dt steps (i.e., every %g time units).\n', plot_update_freq_dt_steps, plot_update_freq_dt_steps*0.05);
+
+fprintf('\nCalling %s_spatial_plotting with visualization...\n', drive_type);
+fprintf('A figure window should appear showing genotype frequencies over space, updating in real-time.\n');
+
+% Run simulation
+tic;
+switch drive_type
+    case 'TARE'
+        drive_efficiency = TARE_spatial_plotting(intro, Nr, T, plot_update_freq_dt_steps);
+    case 'Two_locus_TARE'
+        drive_efficiency = Two_locus_TARE_spatial_plotting(intro, Nr, T, plot_update_freq_dt_steps);
+    case 'TADE_suppression'
+        drive_efficiency = TADE_suppression_spatial_plotting(intro, Nr, T, plot_update_freq_dt_steps);
+    case 'CifAB'
+        drive_efficiency = CifAB_spatial_plotting(intro, Nr, T, plot_update_freq_dt_steps);
+    case 'Wolbachia'
+        drive_efficiency = Wolbachia_spatial_plotting(intro, Nr, T, plot_update_freq_dt_steps);
+    otherwise
+        drive_efficiency = NaN;
+        warning('Unknown drive_type specified: %s. No function was called.', drive_type);
+end
+elapsed_time = toc;
+
+fprintf('\n--- Test Run Completed ---\n');
+fprintf('Simulation with plotting took %.2f seconds.\n', elapsed_time);
+fprintf('Calculated Drive Spread Efficiency (res): %f\n', drive_efficiency);
+fprintf('--- End of Standalone Test ---\n');
